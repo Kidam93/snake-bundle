@@ -2,11 +2,20 @@
 <?php
 
 use Dbu\SnakeBundle\Command\SnakeCommand;
+use Dbu\SnakeBundle\Game\Game;
 use Symfony\Component\Console\Application;
 
 require __DIR__.'/vendor/autoload.php';
 
+$game = new Game(80, 24);
+
 $app = new Application();
-$app->add(new SnakeCommand());
+$app->add(new SnakeCommand($game));
 $app->setDefaultCommand('game:snake');
+
+// pkill -USR1 'php ./snake'
+$app->getSignalRegistry()->register(SIGUSR1, function ($signal) use ($game) {
+    $game->cheat();
+});
+
 $app->run();
